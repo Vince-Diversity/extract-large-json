@@ -10,6 +10,6 @@ This is how I'd run this for the first time:
 > python3 extract_good_data.py 5000
 (May take 25 minutes to run.)
 
-The script takes twice the minimum amount of time
+The script takes twice the time
 necessary to extract all s-tagged map info
 into a new file.
