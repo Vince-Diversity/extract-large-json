@@ -1,11 +1,11 @@
 # Verifies large json files
 # by iterating over all of it.
-import ijson
+import pandas as pd
 
 def verify(file, file_name):
     print('Verifying that ' +file_name + ' is readable...')
-    parser = ijson.parse(file)
-    for prefix, event, value in parser: pass
+    df = pd.read_json('test_prom_records.json',lines=True)
+    for line in df: pass
     print('Verification complete!')
     return None
 

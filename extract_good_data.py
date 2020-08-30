@@ -1,7 +1,7 @@
 # The useful data is crammed below a lot of junk.
 # The flag for the topmost useful map is MapID: "s1".
 # s is tagged to all staff-made maps.
-# This script guesses the location of this flag,
+# This script takes guesses for the location of this flag,
 # verifies the flag and copies all below to good_map_tiles.json.
 import ijson
 from itertools import islice
@@ -68,14 +68,24 @@ def goto_first_flag(parser):
         count += 1
     return False
 
+# Formats into records orientation, for sake of pandas
 def extract_from_flag(flag, from_file, to_file):
     from_file.seek(0)
     practically_inf = int(test_run_location_percent*100)
     print('Writing to good_map_tiles.json...')
-    for i in range(header_size):
-        to_file.write(from_file.readline())
+    to_file.write('{') # opening outer dict
+    from_file.readline(); from_file.readline()  # skip array opener
     for line in islice(from_file, flag, practically_inf):
-        to_file.write(line)
+        if line == '        {\n':
+            to_file.write('"RECORDS":{')
+        else:
+            if line == '        },\n':
+                to_file.write('}}\n{')
+            else:
+                if line != '    ]\n':   # write anything except array closer
+                    # skip spaces and line breaks
+                    to_file.write(line.replace(" ", "")[:-1])
+    to_file.write('}')  # closing outer dict
 
 def take_guesses():
     io_parser = argparse.ArgumentParser(

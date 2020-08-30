@@ -1,25 +1,30 @@
-#
 import pandas as pd
 import json
 
-map_list = ['s999', 's1622']
+#map_list = ['s999', 's1622']
+def read_map_list():
+    map_list = []
+    with open('prom_maps.txt', 'r') as oo:
+        for line in oo:
+            map_list.append(line.replace("\n", ""))
+        print(map_list)
+        return map_list
 
 def extract():
-#    messy_df = pd.read_json('test_prom_data.json')
-#    messy_df = pd.read_json('test_prom_records.json',lines=True)
-    messy_df = pd.read_json('test_prom_records.json',chunksize=10,lines=True)
-#    messy_df.to_json('prom_data.json',orient='records',lines=True)
-#    messy_df.to_json('test_prom_records.json',orient='records',lines=True)
+    # about 1000 lines per kB
+#    messy_df = pd.read_json('test_prom_records.json',chunksize=10,lines=True)
+    messy_df = pd.read_json('good_map_records.json',chunksize=1000*1000*100,lines=True)
     write_all(messy_df)
 
 def write_all(messy_df):
     open('prom_data.json','w').close()
     with open('prom_data.json','a+') as target:
+        map_list = read_map_list()
         for chunk in messy_df:
             messy_page = chunk.to_dict()
-            extract_prom(messy_page, target)
+            extract_prom(messy_page, target, map_list)
 
-def extract_prom(messy_page, target):
+def extract_prom(messy_page, target, map_list):
     messy_content = messy_page["RECORDS"]
     for chunk_index, tile in messy_content.items():
         if tile['MapID'] in map_list:
