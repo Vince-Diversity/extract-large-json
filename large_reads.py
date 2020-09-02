@@ -5,11 +5,15 @@ import argparse
 from math import inf
 
 def large_read(a, b):
-    with open("good_map_tiles.json", 'r') as oo:
+    with open("good_map_tiles.json", 'rb') as oo:
+#    with open("good_map_records.json", 'r') as oo:
+#    with open("temp.json", 'r') as oo:
         with open("sample_map_tiles.json", 'w') as scr:
-            add_head(oo, scr)
-            for line in islice(oo, a, b):
-                scr.write(line)
+#            oo.seek(a); print(oo.readline())
+#            add_head(oo, scr)
+            oo.seek(-a-b,2)
+#            for line in islice(oo, a, b):   scr.write(line.decode('utf-8','ignore'))
+            for line in islice(oo, a, b):   scr.write(line.decode().replace('\n',''))
         scr.close()
     oo.close()
 

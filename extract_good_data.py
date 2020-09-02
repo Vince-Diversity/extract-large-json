@@ -12,17 +12,18 @@ import argparse
 header_size = 3
 # approximate location of s1, found in test runs
 test_run_location_percent = 8567631.19
-# byte array decoder that
-# gets rid of unnecesary \n which the 'rb' somehow spawns
-decode = lambda b: b.decode()[:-1]
+# decode while skipping lines, which is needed for Windows
+# and if there's a non utf-8 character, ignore it
+decode = lambda b: b.decode('utf-8','ignore').replace('\n','')
 
 def extract(guess):
-    with open('map_tiles.json', 'rb') as big_file:
+#    with open('map_tiles.json', 'rb') as big_file:
+    with open('s1501_error_tiles.json', 'rb') as big_file:
         print('Climbing this high up...', guess)
         guess_file = open('temp.json', 'r+')
         make_guess_file(-guess, big_file, guess_file)
         parser = ijson.parse(guess_file)
-        flag_location = goto_first_flag(parser)
+        flag_location = goto_first_flag(parser, guess_file)
         if not flag_location:
             print('Not high enough!')
             open('temp.json', 'w').close()  # empty temp.json
@@ -46,12 +47,9 @@ def make_guess_file(guess, big_file, guess_file):
     big_file.readline() # go to end of line
     for line in big_file:
         guess_file.write(decode(line))
-    # recover the final bracket
-    big_file.seek(-1, SEEK_END)
-    guess_file.write(big_file.readline().decode())
     guess_file.seek(0)  # reset location
 
-def goto_first_flag(parser):
+def goto_first_flag(parser, guess_file):
     count = 0
     for prefix, event, value in parser:
         if event == 'end_map':  # event at opening bracket
@@ -61,6 +59,7 @@ def goto_first_flag(parser):
                 value_flag = value
                 if value_flag == "s1":
                     print('Found map flag! ID: ', value)
+                    print('at ', guess_file.tell())
                     flag_location = int(count/2) # json.parse counts twice
                     flag_location -= 1  # include the flag MapID
                     flag_location -= 1  # include opening bracket
@@ -68,7 +67,7 @@ def goto_first_flag(parser):
         count += 1
     return False
 
-# Formats into records orientation, for sake of pandas
+# Formats into records for easier filtering
 def extract_from_flag(flag, from_file, to_file):
     from_file.seek(0)
     practically_inf = int(test_run_location_percent*100)
@@ -84,12 +83,11 @@ def extract_from_flag(flag, from_file, to_file):
             else:
                 if line != '    ]\n':   # write anything except array closer
                     # skip spaces and line breaks
-                    to_file.write(line.replace(" ", "")[:-1])
-    to_file.write('}')  # closing outer dict
+                    to_file.write(line.replace(" ", "").replace('\n',''))
 
 def take_guesses():
     io_parser = argparse.ArgumentParser(
-        description='How many millions of bits should we climb?'
+        description='How many millions of bytes should we climb?'
         )
     io_parser.add_argument('g', metavar='guess', type=int)
     return io_parser.parse_args().g*999999
