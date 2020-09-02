@@ -17,8 +17,7 @@ test_run_location_percent = 8567631.19
 decode = lambda b: b.decode('utf-8','ignore').replace('\n','')
 
 def extract(guess):
-#    with open('map_tiles.json', 'rb') as big_file:
-    with open('s1501_error_tiles.json', 'rb') as big_file:
+    with open('map_tiles.json', 'rb') as big_file:
         print('Climbing this high up...', guess)
         guess_file = open('temp.json', 'r+')
         make_guess_file(-guess, big_file, guess_file)
@@ -67,22 +66,20 @@ def goto_first_flag(parser, guess_file):
         count += 1
     return False
 
-# Formats into records for easier filtering
+# Format for json.loads()
 def extract_from_flag(flag, from_file, to_file):
     from_file.seek(0)
     practically_inf = int(test_run_location_percent*100)
     print('Writing to good_map_tiles.json...')
-    to_file.write('{') # opening outer dict
     from_file.readline(); from_file.readline()  # skip array opener
     for line in islice(from_file, flag, practically_inf):
         if line == '        {\n':
-            to_file.write('"RECORDS":{')
+            to_file.write('{')
         else:
             if line == '        },\n':
-                to_file.write('}}\n{')
+                to_file.write('}\n')
             else:
-                if line != '    ]\n':   # write anything except array closer
-                    # skip spaces and line breaks
+                if line != '    ]\n' and line != '}':   # skips the last brackets
                     to_file.write(line.replace(" ", "").replace('\n',''))
 
 def take_guesses():
