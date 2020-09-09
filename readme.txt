@@ -20,4 +20,5 @@ Now the file should be small enough to be sent to me.
 If you're curious, this is the rest of the process:
 Specify all maps to extract by adding it in prom_maps.txt
 > python3 extract_prom_data.py
+(Takes about two minutes.)
 The maps are now exported to prom_data.json.
