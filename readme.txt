@@ -5,6 +5,8 @@ How to extract all s-tagged map info from map_tiles.json:
 
 Place the extract_good_data.py
 in the same directory as the map_tiles.json.
+Also place temp.json and good_map_tiles.json with the
+map_tiles.json and extract_good_data.py.
 
 This is how I'd run this for the first time:
 > python3 -m pip install ijson
