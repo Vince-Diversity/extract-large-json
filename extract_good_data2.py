@@ -56,7 +56,7 @@ def goto_first_flag(parser, guess_file):
         if prefix == "RECORDS.item.MapID":
             if value != None and len(value) > 1:
                 value_flag = value
-                if value_flag == "s999":
+                if value_flag == "s1":
                     print('Found map flag! ID: ', value)
                     print('at ', guess_file.tell())
                     flag_location = int(count/2) # json.parse counts twice
